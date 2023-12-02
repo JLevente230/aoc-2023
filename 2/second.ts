@@ -14,20 +14,21 @@ for (let i = 0; i < splitInput.length; i++) {
     const game = splitInput[i].split(' ').slice(2);
     let possible = true;
 
-    for (let j = 0; j < game.length - 2; j = j + 2) {
+    for (let j = 0; j < game.length - 1; j = j + 2) {
         const amount = +game[j];
-        let color = game[j + 1].replace(',', '').replace(';', '');
+        let color = game[j + 1].replace(',', '').replace(';', '').replace('\r', '');
 
-        if (color === 'red' && amount >= redLimit ||
-            color === 'green' && amount >= greenLimit ||
-            color === 'blue' && amount >= blueLimit) {
+        if ((color === 'red' && amount > redLimit) ||
+            (color === 'green' && amount > greenLimit) ||
+            (color === 'blue' && amount > blueLimit)) {
             possible = false;
-            console.log(gameID)
             break;
         }
     }
 
-    if (possible) result += gameID;
+    if (possible){
+        result += gameID;
+    }
 }
 
 console.log(result);
