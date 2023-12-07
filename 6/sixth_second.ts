@@ -20,12 +20,12 @@ let pivot = Math.floor(+time / 2);
 for (let j = pivot + 1; j < +time; j++) {
     if (j * (+time - j) > +distance) {
         result++;
-    }
+    } else break;
 }
 for (let j = pivot; j > 0; j--) {
     if (j * (+time - j) > +distance) {
         result++;
-    }
+    } else break;
 }
 
 console.log(result);
