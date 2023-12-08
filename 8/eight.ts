@@ -7,7 +7,6 @@ while (input.includes('\r')) input = input.replace('\r', '');
 let inputArray = input.trim().split('\n');
 
 let directions = inputArray[0];
-console.log(directions.length)
 
 let map: Map<string, string[]> = new Map();
 
@@ -20,7 +19,15 @@ for (let i = 0; i < inputArray.length - 2; i++) {
     ]);
 }
 
-console.log(map)
+let leftMap: Map<string, string> = new Map();
+let rightMap: Map<string, string> = new Map();
+for (let i = 2; i < inputArray.length; i++) {
+    let position = inputArray[i].split('=')[0].trim();
+    let left = lookUpPosition(position, 'L');
+    let right = lookUpPosition(position, 'R');
+    leftMap.set(position, left);
+    rightMap.set(position, right);
+}
 
 function lookUpPosition(position: string, direction: string) {
     let newPositions = map.get(position);
@@ -31,32 +38,16 @@ function lookUpPosition(position: string, direction: string) {
     } else return 'XDDDDDDDDDDDDDDDDDD';
 }
 
-function right(position: string) {
-    return lookUpPosition(position, 'R');
-}
-
-function left(position: string) {
-    return lookUpPosition(position, 'L');
-}
-
-function evaluate(position: string, direction: string) {
-    if (direction === 'L') return left(position);
-    return right(position);
-}
-
-function getDirection(steps: number) {
-    let index = (steps % directions.length);
-    return directions[index];
-}
-
-function follow(position: string, steps: number, direction: string) {
-    let evaluation = evaluate(position, direction);
-    if (evaluation === 'ZZZ') {
-        return steps;
-    } else {
-        let newDirection = getDirection(steps);
-        return follow(evaluation, steps + 1, newDirection);
+let counter = 0;
+let prevResult = 'AAA';
+while (true) {
+    let direction = directions[counter % directions.length];
+    let result = direction === 'L' ? leftMap.get(prevResult) : rightMap.get(prevResult);
+    if (result !== undefined) prevResult = result;
+    counter++;
+    if (result === 'ZZZ') {
+        break;
     }
 }
 
-console.log(follow('AAA', 1, directions[0]));
+console.log(counter);
