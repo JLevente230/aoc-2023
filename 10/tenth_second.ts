@@ -42,7 +42,7 @@ for (let i = 0; i < inputMatrix.length; i++) {
 }
 
 function determineDirection(i: number, j: number, dir: string) {
-    outPutMatrix[i][j] = 'X';
+    outPutMatrix[i][j] = inputMatrix[i][j];
     switch (inputMatrix[i][j]) {
         case '|':
             if (dir === 'n') return 'n';
@@ -152,21 +152,82 @@ function noWayOut(indexI: number, indexJ: number) {
     return true;
 }
 
+function noWayOutExpanded(indexI: number, indexJ: number) {
+    let x = indexI;
+    let y = indexJ;
+    while (x > 0) {
+        if (expandedMatrix[x][indexJ] !== '.') break;
+        x--;
+    }
+    if (x === 0) return false;
+    x = indexI;
+    while (x < expandedMatrix.length - 1) {
+        if (expandedMatrix[x][indexJ] !== '.') break;
+        x++;
+    }
+    if (x === expandedMatrix.length - 1) return false;
+
+    while (y > 0) {
+        if (expandedMatrix[indexI][y] !== '.') break;
+        y--;
+    }
+    if (y === 0) return false;
+    y = indexJ;
+    while (y < expandedMatrix[0].length - 1) {
+        if (expandedMatrix[indexI][y] !== '.') break;
+        y++;
+    }
+    if (y === expandedMatrix[0].length - 1) return false;
+
+    return true;
+}
+
 let potentiallyCovered: number[][] = [];
 for (let i = 0; i < outPutMatrix.length; i++) {
     for (let j = 0; j < outPutMatrix[i].length; j++) {
         if (outPutMatrix[i][j] === '.' && noWayOut(i, j)) {
-            outPutMatrix[i][j] = 'O';
+            outPutMatrix[i][j] = '.';
             potentiallyCovered.push([i, j]);
         }
     }
 }
 
+let expandedMatrix: string[][] = [];
+for (let i = 0; i < (outPutMatrix.length * 2); i++) {
+    expandedMatrix.push([]);
+    for (let j = 0; j < (outPutMatrix[0].length * 2); j++) {
+        expandedMatrix[i].push('');
+    }
+}
+
+for (let i = 0; i < expandedMatrix.length; i++) {
+    for (let j = 0; j < expandedMatrix[i].length; j++) {
+        if (outPutMatrix[Math.floor(i / 2)][Math.floor(j / 2)] === '-' ||
+            outPutMatrix[Math.floor(i / 2)][Math.floor(j / 2)] === 'L' ||
+            outPutMatrix[Math.floor(i / 2)][Math.floor(j / 2)] === 'F') {
+            expandedMatrix[i][j] = outPutMatrix[Math.floor(i / 2)][Math.floor(j / 2)];
+            expandedMatrix[i][j + 1] = '-';
+        } else {
+            expandedMatrix[i][j] = outPutMatrix[Math.floor(i / 2)][Math.floor(j / 2)];
+            expandedMatrix[i][j + 1] = '.';
+        }
+        j++;
+    }
+}
+
+for (let i = 0; i < expandedMatrix.length; i++) {
+    for (let j = 0; j < expandedMatrix[i].length; j++) {
+        if (expandedMatrix[i][j] === '.' && noWayOutExpanded(i, j)) {
+            expandedMatrix[i][j] = '0';
+        }
+    }
+}
+
 let realOutPutMatrix: string[] = [];
-for (let i = 0; i < outPutMatrix.length; i++) {
+for (let i = 0; i < expandedMatrix.length; i++) {
     let row = '';
-    for (let j = 0; j < outPutMatrix[i].length; j++) {
-        row = row + outPutMatrix[i][j];
+    for (let j = 0; j < expandedMatrix[i].length; j++) {
+        row = row + expandedMatrix[i][j];
     }
     realOutPutMatrix.push(row);
 }
