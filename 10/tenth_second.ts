@@ -1,15 +1,14 @@
 import * as fs from 'fs';
 
-let input = '.F----7F7F7F7F-7....\n' +
-    '.|F--7||||||||FJ....\n' +
-    '.||.FJ||||||||L7....\n' +
-    'FJL7L7LJLJ||LJ.L-7..\n' +
-    'L--J.L7...LJS7F-7L7.\n' +
-    '....F-J..F7FJ|L7L7L7\n' +
-    '....L7.F7||L7|.L7L7|\n' +
-    '.....|FJLJ|FJ|F7|.LJ\n' +
-    '....FJL-7.||.||||...\n' +
-    '....L---J.LJ.LJLJ...';//fs.readFileSync('10/input.txt', 'utf-8');
+let input = '...........\n' +
+    '.S-------7.\n' +
+    '.|F-----7|.\n' +
+    '.||.....||.\n' +
+    '.||.....||.\n' +
+    '.|L-7.F-J|.\n' +
+    '.|..|.|..|.\n' +
+    '.L--J.L--J.\n' +
+    '...........';//fs.readFileSync('10/input.txt', 'utf-8');
 
 while (input.includes('\r')) input = input.replace('\r', '');
 
@@ -124,9 +123,9 @@ while (true) {
 }
 
 let expandedMatrix: string[][] = [];
-for (let i = 0; i < outPutMatrix.length * 2; i++) {
+for (let i = 0; i < outPutMatrix.length * 2 - 1; i++) {
     expandedMatrix.push([]);
-    for (let j = 0; j < outPutMatrix[0].length * 2; j++) {
+    for (let j = 0; j < outPutMatrix[0].length * 2 - 1; j++) {
         if (i % 2 === 0 && j % 2 === 0) {
             expandedMatrix[i][j] = outPutMatrix[i / 2][j / 2];
         } else {
@@ -167,6 +166,20 @@ for (let i = 0; i < expandedMatrix.length; i++) {
 let startingI = -1;
 let startingJ = -1;
 
+function neighborToInfect(first: number, second: number) {
+    if (first < expandedMatrix.length - 1 && first > 0 && second < expandedMatrix[0].length - 1 && second > 0) {
+        if (expandedMatrix[first + 1][second] === '.') {
+            return [first + 1, second];
+        } else if (expandedMatrix[first][second + 1] === '.') {
+            return [first, second + 1];
+        } else if (expandedMatrix[first - 1][second] === '.') {
+            return [first - 1, second];
+        } else if (expandedMatrix[first][second - 1] === '.') {
+            return [first, second - 1];
+        } else return [-1, -1];
+    } else return [-1, -1];
+}
+
 function infect(indexI: number, indexJ: number, count: number) {
     expandedMatrix[indexI][indexJ] = 'o';
     areas[count].push([indexI, indexJ]);
@@ -197,11 +210,10 @@ let areas: number[][][] = [];
 let count = 0;
 while (true) {
     for (let i = 0; i < expandedMatrix.length && startingI === -1; i++) {
-        for (let j = 0; j < expandedMatrix[i].length; j++) {
+        for (let j = 0; j < expandedMatrix[i].length && startingJ === -1; j++) {
             if (expandedMatrix[i][j] === '.') {
                 startingI = i;
                 startingJ = j;
-                break;
             }
         }
     }
@@ -224,7 +236,7 @@ function wayOut(indexI: number, indexJ: number) {
         indexFirst--;
     }
 
-    if (indexFirst <= 0) return true;
+    if (indexFirst < 0) return true;
 
     indexFirst = indexI;
 
@@ -234,7 +246,7 @@ function wayOut(indexI: number, indexJ: number) {
         }
         indexFirst++;
     }
-    if (indexFirst >= expandedMatrix.length - 1) return true;
+    if (indexFirst > expandedMatrix.length - 1) return true;
 
     while (indexSecond >= 0) {
         if (expandedMatrix[indexI][indexSecond] !== 'o') {
@@ -242,7 +254,7 @@ function wayOut(indexI: number, indexJ: number) {
         }
         indexSecond--;
     }
-    if (indexSecond <= 0) return true;
+    if (indexSecond < 0) return true;
 
     indexSecond = indexJ;
 
@@ -252,7 +264,7 @@ function wayOut(indexI: number, indexJ: number) {
         }
         indexSecond++;
     }
-    if (indexSecond >= expandedMatrix[0].length - 1) return true;
+    if (indexSecond > expandedMatrix[0].length - 1) return true;
     return false;
 }
 
@@ -289,8 +301,6 @@ for (let i = 0; i < expandedMatrix.length; i++) {
         }
     }
 }
-
-console.log(areas)
 
 let result = 0;
 for (let i = 0; i < expandedMatrix.length; i++) {
