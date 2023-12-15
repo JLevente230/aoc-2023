@@ -1,14 +1,6 @@
 import * as fs from 'fs';
 
-let input = '...........\n' +
-    '.S-------7.\n' +
-    '.|F-----7|.\n' +
-    '.||.....||.\n' +
-    '.||.....||.\n' +
-    '.|L-7.F-J|.\n' +
-    '.|..|.|..|.\n' +
-    '.L--J.L--J.\n' +
-    '...........';//fs.readFileSync('10/input.txt', 'utf-8');
+let input = fs.readFileSync('10/input.txt', 'utf-8');
 
 while (input.includes('\r')) input = input.replace('\r', '');
 
@@ -138,7 +130,7 @@ let foundS = false;
 for (let i = 0; i < expandedMatrix.length && !foundS; i++) {
     for (let j = 0; j < expandedMatrix[i].length; j++) {
         if (expandedMatrix[i][j] === 'S') {
-            expandedMatrix[i][j] = 'F'; // REWRITE THIS
+            expandedMatrix[i][j] = '|'; // REWRITE THIS
             foundS = true;
             break;
         }
@@ -166,44 +158,9 @@ for (let i = 0; i < expandedMatrix.length; i++) {
 let startingI = -1;
 let startingJ = -1;
 
-function neighborToInfect(first: number, second: number) {
-    if (first < expandedMatrix.length - 1 && first > 0 && second < expandedMatrix[0].length - 1 && second > 0) {
-        if (expandedMatrix[first + 1][second] === '.') {
-            return [first + 1, second];
-        } else if (expandedMatrix[first][second + 1] === '.') {
-            return [first, second + 1];
-        } else if (expandedMatrix[first - 1][second] === '.') {
-            return [first - 1, second];
-        } else if (expandedMatrix[first][second - 1] === '.') {
-            return [first, second - 1];
-        } else return [-1, -1];
-    } else return [-1, -1];
-}
-
 function infect(indexI: number, indexJ: number, count: number) {
     expandedMatrix[indexI][indexJ] = 'o';
     areas[count].push([indexI, indexJ]);
-
-    if (indexJ < expandedMatrix[0].length - 1) {
-        if (expandedMatrix[indexI][indexJ + 1] === '.') {
-            infect(indexI, indexJ + 1, count);
-        }
-    }
-    if (indexJ > 0) {
-        if (expandedMatrix[indexI][indexJ - 1] === '.') {
-            infect(indexI, indexJ - 1, count);
-        }
-    }
-    if (indexI < expandedMatrix.length - 1) {
-        if (expandedMatrix[indexI + 1][indexJ] === '.') {
-            infect(indexI + 1, indexJ, count);
-        }
-    }
-    if (indexI > 0) {
-        if (expandedMatrix[indexI - 1][indexJ] === '.') {
-            infect(indexI - 1, indexJ, count);
-        }
-    }
 }
 
 let areas: number[][][] = [];
@@ -302,14 +259,130 @@ for (let i = 0; i < expandedMatrix.length; i++) {
     }
 }
 
+function cleanMatrix() {
+    for (let i = 0; i < expandedMatrix.length; i++) {
+        for (let j = 0; j < expandedMatrix[i].length; j++) {
+            if (expandedMatrix[i][j] === 'X') {
+                let indexI = i;
+                let indexJ = j;
+                let found = false;
+                while (indexI < expandedMatrix.length - 1) {
+                    indexI++;
+                    if (expandedMatrix[indexI][indexJ] === 'o') {
+                        found = true;
+                        break;
+                    } else if (expandedMatrix[indexI][indexJ] === '|' ||
+                        expandedMatrix[indexI][indexJ] === '-' ||
+                        expandedMatrix[indexI][indexJ] === 'F' ||
+                        expandedMatrix[indexI][indexJ] === '7' ||
+                        expandedMatrix[indexI][indexJ] === 'J' ||
+                        expandedMatrix[indexI][indexJ] === 'L') {
+                        indexI--;
+                        break;
+                    }
+                }
+                if (indexI === expandedMatrix.length - 1 || found) {
+                    expandedMatrix[i][j] = 'o';
+                }
+
+                indexI = i;
+                indexJ = j;
+                found = false;
+                while (indexJ < expandedMatrix[0].length - 1) {
+                    indexJ++;
+                    if (expandedMatrix[indexI][indexJ] === 'o') {
+                        found = true;
+                        break;
+                    } else if (expandedMatrix[indexI][indexJ] === '|' ||
+                        expandedMatrix[indexI][indexJ] === '-' ||
+                        expandedMatrix[indexI][indexJ] === 'F' ||
+                        expandedMatrix[indexI][indexJ] === '7' ||
+                        expandedMatrix[indexI][indexJ] === 'J' ||
+                        expandedMatrix[indexI][indexJ] === 'L') {
+                        indexJ--;
+                        break;
+                    }
+                }
+                if (indexJ === expandedMatrix[0].length - 1 || found) {
+                    expandedMatrix[i][j] = 'o';
+                }
+
+                indexI = i;
+                indexJ = j;
+                found = false;
+                while (indexI > 0) {
+                    indexI--;
+                    if (expandedMatrix[indexI][indexJ] === 'o') {
+                        found = true;
+                        break;
+                    } else if (expandedMatrix[indexI][indexJ] === '|' ||
+                        expandedMatrix[indexI][indexJ] === '-' ||
+                        expandedMatrix[indexI][indexJ] === 'F' ||
+                        expandedMatrix[indexI][indexJ] === '7' ||
+                        expandedMatrix[indexI][indexJ] === 'J' ||
+                        expandedMatrix[indexI][indexJ] === 'L') {
+                        indexI++;
+                        break;
+                    }
+                }
+                if (indexI === 0 || found) {
+                    expandedMatrix[i][j] = 'o';
+                }
+
+                indexI = i;
+                indexJ = j;
+                found = false;
+                while (indexJ > 0) {
+                    indexJ--;
+                    if (expandedMatrix[indexI][indexJ] === 'o') {
+                        found = true;
+                        break;
+                    } else if (expandedMatrix[indexI][indexJ] === '|' ||
+                        expandedMatrix[indexI][indexJ] === '-' ||
+                        expandedMatrix[indexI][indexJ] === 'F' ||
+                        expandedMatrix[indexI][indexJ] === '7' ||
+                        expandedMatrix[indexI][indexJ] === 'J' ||
+                        expandedMatrix[indexI][indexJ] === 'L') {
+                        indexJ++;
+                        break;
+                    }
+                }
+                if (indexJ === 0 || found) {
+                    expandedMatrix[i][j] = 'o';
+                }
+
+            }
+        }
+    }
+}
+
+for (let i= 0; i < 15; i++) {
+    cleanMatrix();
+}
+
+function resultsIncludes(indexI: number, indexJ: number): boolean {
+    for (let i = 0; i < resultsArray.length; i++) {
+        if (resultsArray[i][0] === indexI && resultsArray[i][1] === indexJ) {
+            return true;
+        }
+    }
+    return false;
+}
+
 let result = 0;
+let resultsArray: number[][] = [];
 for (let i = 0; i < expandedMatrix.length; i++) {
     for (let j = 0; j < expandedMatrix[i].length; j++) {
         if (i < expandedMatrix.length - 1 && j < expandedMatrix[i].length - 1 &&
             expandedMatrix[i + 1][j] === 'X' && expandedMatrix[i][j] === 'X' &&
             expandedMatrix[i][j + 1] === 'X' && expandedMatrix[i + 1][j + 1] === 'X') {
-            result++;
-            j++;
+            if (!resultsIncludes(i, j) && !resultsIncludes(i + 1, j + 1) && !resultsIncludes(i + 1, j) && !resultsIncludes(i, j + 1)) {
+                result++;
+                resultsArray.push([i, j]);
+                resultsArray.push([i + 1, j + 1]);
+                resultsArray.push([i + 1, j]);
+                resultsArray.push([i, j + 1]);
+            }
         }
     }
 }
@@ -324,4 +397,5 @@ for (let i = 0; i < expandedMatrix.length; i++) {
 }
 
 console.log(realOutPutMatrix);
-console.log(result / 2);
+
+console.log(result);
